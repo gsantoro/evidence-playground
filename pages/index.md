@@ -1,56 +1,91 @@
 ---
-title: Welcome to Evidence
+title: Kubecon 2025
 ---
 
-<Details title='How to edit this page'>
+## Talks by day
 
-  This page can be found in your project at `/pages/index.md`. Make a change to the markdown file and save it to see the change take effect in your browser.
-</Details>
-
-```sql categories
-  select
-      category
-  from needful_things.orders
-  group by category
-```
-
-<Dropdown data={categories} name=category value=category>
-    <DropdownOption value="%" valueLabel="All Categories"/>
-</Dropdown>
-
-<Dropdown name=year>
-    <DropdownOption value=% valueLabel="All Years"/>
-    <DropdownOption value=2019/>
-    <DropdownOption value=2020/>
-    <DropdownOption value=2021/>
-</Dropdown>
-
-```sql orders_by_category
+```sql talks_by_day
   select 
-      date_trunc('month', order_datetime) as month,
-      sum(sales) as sales_usd,
-      category
-  from needful_things.orders
-  where category like '${inputs.category.value}'
-  and date_part('year', order_datetime) like '${inputs.year.value}'
-  group by all
-  order by sales_usd desc
+    date_trunc('day', eventDate) as event_day,
+    count(*) as num_talks
+  from kubecon_schedule.talks
+  group by event_day
+  order by event_day
 ```
 
 <BarChart
-    data={orders_by_category}
-    title="Sales by Month, {inputs.category.label}"
-    x=month
-    y=sales_usd
-    series=category
+    data={talks_by_day}
+    title="Talks by Day"
+    x=event_day
+    y=num_talks
 />
 
-## What's Next?
-- [Connect your data sources](settings)
-- Edit/add markdown files in the `pages` folder
-- Deploy your project with [Evidence Cloud](https://evidence.dev/cloud)
 
-## Get Support
-- Message us on [Slack](https://slack.evidence.dev/)
-- Read the [Docs](https://docs.evidence.dev/)
-- Open an issue on [Github](https://github.com/evidence-dev/evidence)
+<!-- <Dropdown 
+  data={talks_by_day} 
+  name="event_day" 
+  value="num_talks"
+/> -->
+
+
+## All talks
+
+
+
+```sql talks
+  select 
+    eventDate,
+    title
+  from kubecon_schedule.talks
+```
+
+<DataTable
+    data={talks}
+    title="All talks"
+    sort="eventDate desc"
+    search=true
+    limit=10
+/>
+
+## Talks by event type
+
+```sql talks_by_event_type
+  select 
+    eventTypes,
+    title
+  from kubecon_schedule.talks
+  group by eventTypes, title
+```
+
+<DataTable
+    data={talks_by_event_type}
+    title="All talks - search by title"
+    sort="eventTypes desc"
+    search=true
+    limit=10
+/>
+
+<Dropdown 
+  data={talks_by_event_type} 
+  title="Choose an event type"
+  name="eventTypes" 
+  value="eventTypes"
+/>
+
+```sql talks_for_event_type
+  select 
+    title,
+    url
+  from kubecon_schedule.talks
+  where eventTypes = '${inputs.eventTypes.value}'
+```
+
+<DataTable
+    data={talks_for_event_type}
+    title="Talks for event type: {inputs.eventTypes.label}"
+    sort="title desc"
+    search=true
+    limit=10
+>
+  <Column id="url" contentType="link" linkField="url" linkLabel=title />
+</DataTable>
