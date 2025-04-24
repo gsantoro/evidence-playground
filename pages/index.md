@@ -29,55 +29,63 @@ title: Kubecon 2025
 
 
 ## All talks
+All talks sorted by title (descending)
 
 
-
-```sql talks
+```sql all_talks
   select 
-    eventDate,
-    title
+    title,
+    url
   from kubecon_schedule.talks
 ```
 
 <DataTable
-    data={talks}
-    title="All talks"
-    sort="eventDate desc"
+    data={all_talks}
+    title="Search a talk by name"
+    sort="title desc"
     search=true
     limit=10
-/>
+>
+  <Column id="url" contentType="link" linkField="url" linkLabel=title />
+</DataTable>
 
 ## Talks by event type
+Talks grouped by event type
 
-```sql talks_by_event_type
-  select 
-    eventTypes,
-    title
-  from kubecon_schedule.talks
-  group by eventTypes, title
+
+```sql event_type_count
+select title,
+    eventType,
+    count(*) as cnt
+from kubecon_schedule.talks_single_type
+group by eventType, title
+order by cnt desc;
 ```
 
-<DataTable
-    data={talks_by_event_type}
-    title="All talks - search by title"
-    sort="eventTypes desc"
-    search=true
-    limit=10
+
+<BarChart
+    data={event_type_count}
+    title="Talks by event type"
+    x=eventType
+    y=cnt
+    labels=true
+    
 />
 
+
 <Dropdown 
-  data={talks_by_event_type} 
+  data={event_type_count} 
   title="Choose an event type"
   name="eventTypes" 
-  value="eventTypes"
+  value="eventType"
 />
 
 ```sql talks_for_event_type
   select 
     title,
     url
-  from kubecon_schedule.talks
-  where eventTypes = '${inputs.eventTypes.value}'
+  from kubecon_schedule.talks_single_type
+  where eventType = '${inputs.eventTypes.value}'
 ```
 
 <DataTable
