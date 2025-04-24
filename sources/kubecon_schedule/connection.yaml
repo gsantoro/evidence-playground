@@ -1,0 +1,5 @@
+# This file was automatically generated
+name: kubecon_schedule
+type: duckdb
+options:
+  filename: kubecon_schedule.duckdb
