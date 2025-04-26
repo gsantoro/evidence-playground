@@ -1,0 +1,5 @@
+# This file was automatically generated
+name: cncf_landscape
+type: duckdb
+options:
+  filename: cncf_landscape.duckdb
